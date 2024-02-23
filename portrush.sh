@@ -261,7 +261,7 @@ do
   tput sgr0
 
   # Run nmap scan and save the output to a file with the IP address as the name
-  if ! sudo nmap -p "$open_ports_formatted" -A "$ip" -oN nmap.txt 2>&1 | tee -a "$output_file"; then
+  if ! sudo nmap -p "$open_ports_formatted" -Pn -sV -sC "$ip" -oN nmap.txt 2>&1 | tee -a "$output_file"; then
     echo -e "\n"
     echo -e "$(generate_divider "$(tput setaf 1)[-] FAILED TO RUN NMAP ON $ip")"
     tput sgr0
@@ -345,7 +345,7 @@ else
   tput sgr0
 
   # Run nmap scan and save the output to a file with the IP address as the name
-  if ! sudo nmap -p "$open_ports_formatted" -sC -A "$ip" -oN nmap.txt; then
+  if ! sudo nmap -p "$open_ports_formatted" -Pn -sV -sC "$ip" -oN nmap.txt; then
     echo -e "\n"
     echo -e "$(generate_divider "$(tput setaf 1)[-] FAILED TO RUN MASSCAN ON $ip")"
     tput sgr0
