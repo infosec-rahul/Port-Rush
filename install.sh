@@ -13,5 +13,5 @@ sudo install -m 755 portrush.sh /usr/local/bin/portrush
 sudo ln -s /usr/local/bin/portrush /usr/bin/portrush
 
 # Display success message
-echo -e "\033[32mSuccessfully installed portrush as a tool.\033[0m"
-echo -e "\033[36mYou can now run portrush from anywhere.\033[0m"
+echo -e "\033[32mPort Rush successfully installed\033[0m"
+echo -e "\033[36mEnjoy!!\033[0m"
