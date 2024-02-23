@@ -10,6 +10,10 @@ A basic tool which uses nmap and masscan for port scanning.
 
 `chmod +x install.sh`
 
-- Run Port Rush.
+- Run install.sh file.
+
+`./install.sh`
+
+- Run Port Rush
 
 `portrush -h`
