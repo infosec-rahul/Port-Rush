@@ -47,16 +47,18 @@ echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
 
 # If no IP file or IP address is provided, display the help message
 if [ -z "$1" ]; then
-  echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>]"
+  echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
   echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
   echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
   echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+  echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
   echo "  -h                DISPLAY THIS HELP MESSAGE"
   exit 0
 fi
 
 # Parse command line arguments
-while getopts ":i:s:h:p:" opt; do
+output_folder=""
+while getopts ":i:s:h:p:o:" opt; do
   case $opt in
     i)
       ip_file="$OPTARG"
@@ -65,31 +67,37 @@ while getopts ":i:s:h:p:" opt; do
       ip="$OPTARG"
       ;;
     h)
-      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>]"
+      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
       echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
       echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
       echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+      echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
       echo "  -h                DISPLAY THIS HELP MESSAGE"
       exit 0
       ;;
     p)
       port_range="$OPTARG"
       ;;
+    o)
+      output_folder="$OPTARG"
+      ;;
     \?)
       echo "INVALID OPTION: -$OPTARG" >&2
-      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>]"
+      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
       echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
       echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
       echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+      echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
       echo "  -h                DISPLAY THIS HELP MESSAGE"
       exit 1
       ;;
     :)
       echo "OPTION -$OPTARG REQUIRES AN ARGUMENT." >&2
-      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>]"
+      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
       echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
       echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
       echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+      echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
       echo "  -h                DISPLAY THIS HELP MESSAGE"
       exit 1
       ;;
@@ -101,10 +109,23 @@ if [ -z "$port_range" ]; then
   port_range="1-65535"
 fi
 
+# Create output folder if it doesn't exist
+if [ ! -d "$output_folder" ]; then
+  mkdir -p "$output_folder"
+  if [ ! -d "$output_folder" ]; then
+    echo -e "\n"
+    echo -e "${RED}[-] ERROR: FAILED TO CREATE OUTPUT FOLDER $output_folder.${RESET}"
+    exit 1
+  fi
+fi
+
+# Change the working directory to the output folder
+cd "$output_folder"
+
 # Output Summary File
 current_time=$(date +"%Y-%m-%d_%H-%M-%S")
 current_dir=$(basename "$(pwd)")
-output_file="${current_dir}_${current_time}.txt"
+output_file="${output_folder}/${current_dir}_${current_time}.txt"
 exec > >(tee -a "$output_file")
 exec 2>&1
 
@@ -180,7 +201,7 @@ if [ -n "$ip_file" ]; then
 # Get the total number of IPs in the file
 total_ips=$(wc -l < "$ip_file")
 echo -e "\n"
-echo -e "$(generate_divider "$(tput setaf 6) * * * SCANNING $total_ips IP ADDRESSES * * * $(tput sgr0)")"
+echo -e "$(generate_divider "$(tput setaf 6) [*] SCANNING $total_ips IP ADDRESSES [*] $(tput sgr0)")"
 
 # Loop through each IP address in the file
 while IFS= read -r ip
@@ -204,7 +225,7 @@ do
 
   # Scan the current IP address
   echo -e "\n"
-  echo -e "$(generate_divider "$(tput setaf 5) ~ ~ ~ STARTING SCAN ON $ip ~ ~ ~ ")"
+  echo -e "$(generate_divider "$(tput setaf 5) [~] STARTING SCAN ON $ip [~] ")"
   tput sgr0
 
   # Display the command to be executed
@@ -213,7 +234,7 @@ do
   tput sgr0
 
   # Run masscan and save the output to a file with the IP address as the name
-  if ! sudo masscan -p$port_range "$ip" -oG masscan.txt; then
+  if ! sudo masscan -p$port_range "$ip" -oG masscan.txt 2>&1 | tee -a "$output_file"; then
     echo -e "\n"
     echo -e "$(generate_divider "$(tput setaf 1)[-] FAILED TO RUN MASSCAN ON $ip")"
     tput sgr0
@@ -240,7 +261,7 @@ do
   tput sgr0
 
   # Run nmap scan and save the output to a file with the IP address as the name
-  if ! sudo nmap -p "$open_ports_formatted" -A "$ip" -oN nmap.txt; then
+  if ! sudo nmap -p "$open_ports_formatted" -A "$ip" -oN nmap.txt 2>&1 | tee -a "$output_file"; then
     echo -e "\n"
     echo -e "$(generate_divider "$(tput setaf 1)[-] FAILED TO RUN NMAP ON $ip")"
     tput sgr0
@@ -259,7 +280,7 @@ do
 
   # Print a divider with a message that includes the scanned IP
   echo -e "\n"
-  echo -e "$(generate_divider "$(tput setaf 5) ~ ~ ~ SCAN COMPLETED FOR $ip ~ ~ ~ ")"
+  echo -e "$(generate_divider "$(tput setaf 5) [~] SCAN COMPLETED FOR $ip [~] ")"
   tput sgr0
   cd ..
 done <<< "$(cat "$ip_file")"
@@ -345,6 +366,6 @@ else
 fi
 
 echo -e "\n"
-echo -e "${GREEN}+------------------------------+${RESET}"
-echo -e "${GREEN}| SCAN COMPLETED SUCCESSFULLY! |${RESET}"
-echo -e "${GREEN}+------------------------------+${RESET}"
+echo -e "${GREEN}+ - - - - - - - - +${RESET}"
+echo -e "${GREEN}| SCAN COMPLETED! |${RESET}"
+echo -e "${GREEN}+ - - - - - - - - +${RESET}"
