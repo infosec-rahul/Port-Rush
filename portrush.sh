@@ -37,12 +37,12 @@ fi
 
 # If no IP file or IP address is provided, display the help message
 if [ -z "$1" ]; then
-  echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
-  echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
-  echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
-  echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+  echo "USAGE: portrush [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
+  echo "  -i <IP_FILE>        A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
+  echo "  -s <IP_ADDRESS>     A SINGLE IP ADDRESS TO SCAN"
+  echo "  -p <PORT_RANGE>     A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
   echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
-  echo "  -h                DISPLAY THIS HELP MESSAGE"
+  echo "  -h                  DISPLAY THIS HELP MESSAGE"
   exit 0
 fi
 
@@ -57,12 +57,12 @@ while getopts ":i:s:h:p:o:" opt; do
       ip="$OPTARG"
       ;;
     h)
-      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
-      echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
-      echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
-      echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+      echo "USAGE: portrush [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
+      echo "  -i <IP_FILE>        A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
+      echo "  -s <IP_ADDRESS>     A SINGLE IP ADDRESS TO SCAN"
+      echo "  -p <PORT_RANGE>     A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
       echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
-      echo "  -h                DISPLAY THIS HELP MESSAGE"
+      echo "  -h                  DISPLAY THIS HELP MESSAGE"
       exit 0
       ;;
     p)
@@ -73,22 +73,22 @@ while getopts ":i:s:h:p:o:" opt; do
       ;;
     \?)
       echo "INVALID OPTION: -$OPTARG" >&2
-      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
-      echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
-      echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
-      echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+      echo "USAGE: portrush [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
+      echo "  -i <IP_FILE>        A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
+      echo "  -s <IP_ADDRESS>     A SINGLE IP ADDRESS TO SCAN"
+      echo "  -p <PORT_RANGE>     A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
       echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
-      echo "  -h                DISPLAY THIS HELP MESSAGE"
+      echo "  -h                  DISPLAY THIS HELP MESSAGE"
       exit 1
       ;;
     :)
       echo "OPTION -$OPTARG REQUIRES AN ARGUMENT." >&2
-      echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
-      echo "  -i <IP_FILE>      A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
-      echo "  -s <IP_ADDRESS>   A SINGLE IP ADDRESS TO SCAN"
-      echo "  -p <PORT_RANGE>   A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
+      echo "USAGE: portrush [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
+      echo "  -i <IP_FILE>        A FILE CONTAINING A LIST OF IP ADDRESSES TO SCAN"
+      echo "  -s <IP_ADDRESS>     A SINGLE IP ADDRESS TO SCAN"
+      echo "  -p <PORT_RANGE>     A PORT RANGE TO SCAN (e.g. 1-100, 80,8080,443)"
       echo "  -o <OUTPUT_FOLDER>  THE FOLDER WHERE THE OUTPUT FILES WILL BE SAVED"
-      echo "  -h                DISPLAY THIS HELP MESSAGE"
+      echo "  -h                  DISPLAY THIS HELP MESSAGE"
       exit 1
       ;;
   esac
@@ -187,6 +187,7 @@ echo -e "| nmap version    |"$(tput setaf 2) ${nmap_version}$(tput sgr0) "|"
 echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
 echo -e "| masscan version |"$(tput setaf 2) ${masscan_version}$(tput sgr0)"   |"
 echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
+echo -e "\n"
 
 # If IP file is provided, scan all IP addresses in the file
 if [ -n "$ip_file" ]; then
