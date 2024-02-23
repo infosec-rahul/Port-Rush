@@ -35,16 +35,6 @@ if ! command -v nmap &>/dev/null || ! command -v masscan &>/dev/null; then
   fi
 fi
 
-# Print nmap and masscan versions
-nmap_version=$(nmap --version | head -n 1 | awk '{print $3}')
-masscan_version=$(masscan --version | head -n 2 | awk '{print $3}')
-echo -e "\n"
-echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
-echo -e "| nmap version    |"$(tput setaf 2) ${nmap_version}$(tput sgr0) "|"
-echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
-echo -e "| masscan version |"$(tput setaf 2) ${masscan_version}$(tput sgr0)"   |"
-echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
-
 # If no IP file or IP address is provided, display the help message
 if [ -z "$1" ]; then
   echo "USAGE: $0 [-i <IP_FILE> | -s <IP_ADDRESS>] [-p <PORT_RANGE>] [-o <OUTPUT_FOLDER>]"
@@ -103,6 +93,15 @@ while getopts ":i:s:h:p:o:" opt; do
       ;;
   esac
 done
+
+# Set up colors
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+LIGHT_GREEN=$(tput setaf 5)
+PURPLE=$(tput setaf 6)
+RESET=$(tput sgr0)
 
 # If no port range is provided, set it to all ports (1-65535)
 if [ -z "$port_range" ]; then
@@ -165,16 +164,6 @@ generate_divider() {
   printf '%*s\n' "$length" '' | tr ' ' '~'
 }
 
-
-# Set up colors
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-LIGHT_GREEN=$(tput setaf 5)
-PURPLE=$(tput setaf 6)
-RESET=$(tput sgr0)
-
 # If no IP file or IP address is provided, display an error message
 if [ -z "$ip_file" ] && [ -z "$ip" ]; then
   echo -e "\n"
@@ -188,6 +177,16 @@ if [ -n "$ip_file" ] && [ -n "$ip" ]; then
   echo -e "${RED}[-] ERROR: YOU CANNOT PROVIDE BOTH AN IP FILE AND A SINGLE IP ADDRESS TO SCAN.${RESET}"
   exit 1
 fi
+
+# Print nmap and masscan versions
+nmap_version=$(nmap --version | head -n 1 | awk '{print $3}')
+masscan_version=$(masscan --version | head -n 2 | awk '{print $3}')
+echo -e "\n"
+echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
+echo -e "| nmap version    |"$(tput setaf 2) ${nmap_version}$(tput sgr0) "|"
+echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
+echo -e "| masscan version |"$(tput setaf 2) ${masscan_version}$(tput sgr0)"   |"
+echo -e "${GREEN}+- - - - - - - - - - - - - -+${RESET}"
 
 # If IP file is provided, scan all IP addresses in the file
 if [ -n "$ip_file" ]; then
